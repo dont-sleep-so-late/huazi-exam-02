@@ -138,7 +138,11 @@ const User = () => {
     } else {
       setModalType(1);
       //表单数据回填
-      form.setFieldsValue(data);
+      navigate('/information', {
+        state: {
+          data: data,
+        },
+      });
     }
   };
 

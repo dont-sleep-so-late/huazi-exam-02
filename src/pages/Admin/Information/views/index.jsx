@@ -14,12 +14,15 @@ import {
 } from 'antd';
 import './index.css';
 import { useEffect } from 'react';
-import { useDispatch, useNavigate } from '@umijs/max';
+import { useDispatch, useNavigate, useLocation } from '@umijs/max';
 import UploadAvatar from '../components/UploadAvatar';
 import CascaderProvince from '../components/CascaderProvince';
 const Information = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state;
+
   const [tableData, setTableData] = useState([]);
   const [total, setTotal] = useState(0);
   const [listData, setListData] = useState({
@@ -31,62 +34,6 @@ const Information = () => {
   const [form] = Form.useForm();
   const [searchForm] = Form.useForm();
   const [checked, setChecked] = useState(false);
-
-  const columns = [
-    {
-      title: '身份ID',
-      width: 150,
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: '角色',
-      dataIndex: 'role',
-      key: 'role',
-    },
-    {
-      title: '主要技能',
-      dataIndex: 'skills',
-      key: 'skills',
-    },
-    {
-      title: '地区',
-      dataIndex: 'region',
-      key: 'region',
-    },
-    {
-      title: '操作',
-      width: 200,
-      fixed: 'right',
-      render: (rowData) => (
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => {
-              handleClick('edit', rowData);
-            }}
-          >
-            查看详情
-          </Button>
-          <Popconfirm
-            title="确定要删除吗？"
-            onConfirm={() => handleDelete(rowData)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Button type="primary" danger>
-              删除
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
 
   const [role, setRole] = useState([]);
   const roleList = [
@@ -179,17 +126,7 @@ const Information = () => {
   }, [listData]);
 
   const getTableData = () => {
-    setLoading(true);
-    // 获取表格数据
-    dispatch({
-      type: 'user/getUser',
-      payload: listData,
-      callback: (res) => {
-        setTableData(res.data);
-        setTotal(res.total);
-        setLoading(false);
-      },
-    });
+    form.setFieldsValue(state.data);
   };
 
   const handleOK = () => {
@@ -280,6 +217,15 @@ const Information = () => {
             ]}
           >
             <Input placeholder="请输入姓名" />
+          </Form.Item>
+          <Form.Item name="role" label="岗位" rules={[{ required: true, message: '请选择岗位' }]}>
+            <Select
+              options={roleList}
+              value={role}
+              onChange={changeRole}
+              className="form-select"
+              placeholder="请选择选择"
+            />
           </Form.Item>
           <Form.Item label="省份" name="area" rules={[{ required: true, message: '请选择省份' }]}>
             <CascaderProvince changeArea={changeArea} />

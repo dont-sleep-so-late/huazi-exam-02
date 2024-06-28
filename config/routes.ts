@@ -24,13 +24,23 @@ export default [
   },
   {
     path: '/',
-    name: '首页',
-    component: './Home/Home',
+    redirect: '/home',
+    component: '../layouts/BaseLayout',
+  },
+  {
+    path: '/home',
+    name: 'home',
+    component: './Home/views',
   },
   {
     path: '/Admin',
-    name: '用户列表',
-    component: './Admin/views',
+    name: 'admin',
+    component: './Admin/List/views',
+  },
+  {
+    path: '/Information',
+    name: 'form',
+    component: './Admin/Information/views',
   },
 
   // {

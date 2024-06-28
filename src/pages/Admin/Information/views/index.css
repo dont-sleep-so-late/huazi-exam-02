@@ -1,0 +1,19 @@
+.information {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  .flex-box {
+    width: 80%;
+    background-color: #fff;
+    .avatar {
+      margin: 10px;
+    }
+    .btn {
+      display: flex;
+      justify-content: center;
+      Button{
+        margin:10px;
+      }
+    }
+  }
+}

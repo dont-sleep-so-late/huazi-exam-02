@@ -21,7 +21,7 @@ const Settings: ProLayoutProps & {
   footerRender: false,
   // 拂晓蓝
   colorWeak: false,
-  title: 'Ant Design Pro',
+  title: '你别睡这么晚',
   iconfontUrl: '',
 };
 

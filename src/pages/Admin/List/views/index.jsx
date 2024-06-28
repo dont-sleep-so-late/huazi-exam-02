@@ -3,9 +3,11 @@ import { Button, Form, Input, Table, Popconfirm, Modal, Select, Checkbox, Space 
 import './index.css';
 import { useEffect } from 'react';
 import { useDispatch } from '@umijs/max';
+import { useNavigate } from 'umi';
 
 const User = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [tableData, setTableData] = useState([]);
   const [total, setTotal] = useState(0);
   const [listData, setListData] = useState({
@@ -41,7 +43,7 @@ const User = () => {
       key: 'skills',
     },
     {
-      title: '地区',
+      title: '常住地',
       dataIndex: 'region',
       key: 'region',
     },
@@ -132,6 +134,7 @@ const User = () => {
     // 处理点击事件
     if (type == 'add') {
       setModalType(0);
+      navigate('/information');
     } else {
       setModalType(1);
       //表单数据回填
@@ -247,7 +250,7 @@ const User = () => {
               placeholder="请选择选择"
             />
           </Form.Item>
-          <Form.Item name="checkedList" label="所在区域" valuePropName="region">
+          <Form.Item name="checkedList" label="常住地" valuePropName="region">
             <CheckboxGroup
               options={plainOptions}
               value={checkedList}
@@ -318,11 +321,11 @@ const User = () => {
             <Input placeholder="请输入主要技能" />
           </Form.Item>
           <Form.Item
-            label="居住地"
+            label="常住地"
             name="region"
-            rules={[{ required: true, message: '请输入居住地' }]}
+            rules={[{ required: true, message: '请输入常住地' }]}
           >
-            <Input placeholder="请输入居住地" />
+            <Input placeholder="请输入常住地" />
           </Form.Item>
         </Form>
       </Modal>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Avatar, Table } from 'antd';
 import * as Icon from '@ant-design/icons';
 import { useDispatch } from '@umijs/max';
-import './Home.css';
+import './index.css';
 
 const list = [
   {

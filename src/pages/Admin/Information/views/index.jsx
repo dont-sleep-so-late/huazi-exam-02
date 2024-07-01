@@ -241,6 +241,7 @@ const Information = () => {
               options={plainOptions}
               value={regionList}
               checked={checked}
+              defaultValue={form.getFieldValue('regionList')}
               onChange={onChange}
             ></CheckboxGroup>
           </Form.Item>

@@ -201,10 +201,6 @@ const User = () => {
       region: e.checkedList,
     });
   };
-  const handleFinish = (values) => {};
-  useEffect(() => {
-    getTableData();
-  }, [listData]);
 
   const getTableData = () => {
     setLoading(true);

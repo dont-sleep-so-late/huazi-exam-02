@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 import { useDispatch, useNavigate, useLocation } from '@umijs/max';
 import UploadAvatar from '../components/UploadAvatar';
 import CascaderProvince from '../components/CascaderProvince';
+
 const Information = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -80,7 +81,7 @@ const Information = () => {
   ];
   const CheckboxGroup = Checkbox.Group;
   const plainOptions = ['广州', '深圳'];
-  const [checkedList, setCheckedList] = useState();
+  const [regionList, setCheckedList] = useState();
   const onChange = (list) => {
     setCheckedList(list);
   };
@@ -88,65 +89,28 @@ const Information = () => {
     setRole(value);
   };
 
-  const handleClick = (type, data) => {
-    setIsModalOpen(true);
-    // 处理点击事件
-    if (type == 'add') {
-      setModalType(0);
-    } else {
-      setModalType(1);
-      //表单数据回填
-      form.setFieldsValue(data);
-    }
-  };
-
-  const handleDelete = (data) => {
-    // 处理删除事件
-    dispatch({
-      type: 'user/deleteUser',
-      payload: data,
-      callback: (res) => {
-        handleCancel();
-        getTableData();
-      },
-    });
-  };
-
-  const handleSearch = (e) => {
-    // 处理表单提交事件
-    setListData({
-      name: e.username,
-      role: e.role,
-      region: e.checkedList,
-    });
-  };
-  const handleFinish = (values) => {};
-  useEffect(() => {
-    getTableData();
-  }, [listData]);
-
-  const getTableData = () => {
-    form.setFieldsValue(state.data);
-  };
-
-  const handleOK = () => {
-    // 处理确定按钮点击事件
+  const handleFinish = () => {
     form
       .validateFields()
       .then((values) => {
         values = {
           ...values,
           birthday: values['birthday'].format('YYYY-MM-DD'),
+          area: values['area'],
+          region: values['regionList'],
+          remark: values['remark'],
         };
+        console.log(values, 'values');
         setIsModalOpen(false);
-        if (modalType) {
+        if (state.modalType != 0) {
+          console.log('编辑!!', state);
           //编辑
           dispatch({
             type: 'user/updateUser',
             payload: values,
             callback: (res) => {
               handleCancel();
-              getTableData();
+              navigate('/Admin');
             },
           });
         } else {
@@ -156,7 +120,7 @@ const Information = () => {
             payload: values,
             callback: (res) => {
               handleCancel();
-              getTableData();
+              navigate('/Admin');
             },
           });
         }
@@ -164,6 +128,24 @@ const Information = () => {
       .catch((info) => {
         console.log('Validate Failed:', info);
       });
+  };
+
+  const getTableData = () => {
+    console.log(location, 'location');
+    if (location.state) {
+      form.setFieldValue('id', state.data['id']);
+      form.setFieldValue('name', state.data['name']);
+      form.setFieldValue('area', state.data['area']);
+      // form.setFieldValue('birthday', state.data['birthday']);
+      changeAvatar(state.data['avatar']);
+      form.setFieldValue('gender', state.data['gender']);
+      form.setFieldValue('role', state.data['role']);
+      form.setFieldValue('regionList', state.data['region']);
+      form.setFieldValue('skills', state.data['skills']);
+      form.setFieldValue('remark', state.data['remark']);
+      console.log(state, 'state');
+      console.log(form.getFieldsValue(), 'form.getFieldsValue()');
+    }
   };
 
   const handleCancel = () => {
@@ -178,7 +160,12 @@ const Information = () => {
   }, []);
 
   const changeArea = (area) => {
-    form.setFieldValue('area', area.value);
+    //将 item.label 装进数组
+    if (area.selectedOptions) {
+      const prev = [];
+      area.selectedOptions.map((item) => prev.push(item.label));
+      form.setFieldValue('area', prev);
+    }
   };
 
   const changeAvatar = (avatar) => {
@@ -190,9 +177,13 @@ const Information = () => {
       <div className="flex-box">
         <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }} onFinish={handleFinish}>
           {/* 上传头像 */}
-          <div className="avatar">
-            <UploadAvatar changeAvatar={changeAvatar} />
-          </div>
+          <Form.Item name="avatar">
+            <div className="avatar">
+              <UploadAvatar avatar={state?.data['avatar']} changeAvatar={changeAvatar} />
+            </div>
+          </Form.Item>
+          {/* 存在id表单项，但是不展示 */}
+          <Form.Item name="id" style={{ display: 'none' }}></Form.Item>
           <Form.Item
             label="姓名"
             name="name"
@@ -228,13 +219,13 @@ const Information = () => {
             />
           </Form.Item>
           <Form.Item label="省份" name="area" rules={[{ required: true, message: '请选择省份' }]}>
-            <CascaderProvince changeArea={changeArea} />
+            <CascaderProvince form={form.getFieldsValue()} changeArea={changeArea} />
           </Form.Item>
           {/* 选择性别 */}
           <Form.Item label="性别" name="gender" rules={[{ required: true, message: '请选择性别' }]}>
             <Radio.Group>
               <Radio value={1}>男</Radio>
-              <Radio value={2}>女</Radio>
+              <Radio value={0}>女</Radio>
             </Radio.Group>
           </Form.Item>
           {/* 出生日期 */}
@@ -245,20 +236,23 @@ const Information = () => {
           >
             <DatePicker placeholder="请选择出生日期" style={{ width: '20%' }} format="YYYY-MM-DD" />
           </Form.Item>
-          <Form.Item name="checkedList" label="常住地" valuePropName="region">
+          <Form.Item name="regionList" label="常住地" valuePropName="region">
             <CheckboxGroup
               options={plainOptions}
-              value={checkedList}
+              value={regionList}
               checked={checked}
               onChange={onChange}
             ></CheckboxGroup>
+          </Form.Item>
+          <Form.Item label="主要技能" name="skills">
+            <Input placeholder="请输入技能" />
           </Form.Item>
           <Form.Item label="备注" name="remark">
             <Input.TextArea rows={4} placeholder="请输入备注" />
           </Form.Item>
 
           <div className="btn">
-            <Button type="primary" onClick={() => handleOK()} htmlType="submit">
+            <Button type="primary" htmlType="submit">
               确认
             </Button>
             <Button

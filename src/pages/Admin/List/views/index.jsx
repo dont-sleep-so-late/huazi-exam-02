@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, Table, Popconfirm, Modal, Select, Checkbox, Space } from 'antd';
+import { Button, Form, Input, Table, Popconfirm, Avatar, Select, Checkbox, Space } from 'antd';
 import './index.css';
 import { useEffect } from 'react';
 import { useDispatch } from '@umijs/max';
@@ -23,14 +23,38 @@ const User = () => {
   const columns = [
     {
       title: '身份ID',
-      width: 150,
+      width: 100,
       dataIndex: 'id',
       key: 'id',
     },
     {
+      title: '头像',
+      width: 100,
+      dataIndex: 'avatar',
+      key: 'avatar',
+      render: (avatar) => <Avatar src={avatar} size={64} />,
+    },
+
+    {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
+    },
+    {
+      title: '性别',
+      dataIndex: 'gender',
+      key: 'gender',
+      render: (gender) => (gender === 1 ? '男' : '女'),
+    },
+    {
+      title: '出生日期',
+      dataIndex: 'birthday',
+      key: 'birthday',
+    },
+    {
+      title: '省份',
+      dataIndex: 'area',
+      key: 'area',
     },
     {
       title: '角色',
@@ -46,6 +70,11 @@ const User = () => {
       title: '常住地',
       dataIndex: 'region',
       key: 'region',
+    },
+    {
+      title: '备注',
+      dataIndex: 'remark',
+      key: 'remark',
     },
     {
       title: '操作',
@@ -134,12 +163,18 @@ const User = () => {
     // 处理点击事件
     if (type == 'add') {
       setModalType(0);
-      navigate('/information');
+      navigate('/information', {
+        state: {
+          modalType,
+          data: {},
+        },
+      });
     } else {
       setModalType(1);
       //表单数据回填
       navigate('/information', {
         state: {
+          modalType,
           data: data,
         },
       });
@@ -178,44 +213,12 @@ const User = () => {
       type: 'user/getUser',
       payload: listData,
       callback: (res) => {
+        console.log('res', res);
         setTableData(res.data);
         setTotal(res.total);
         setLoading(false);
       },
     });
-  };
-
-  const handleOK = () => {
-    // 处理确定按钮点击事件
-    form
-      .validateFields()
-      .then((values) => {
-        setIsModalOpen(false);
-        if (modalType) {
-          //编辑
-          dispatch({
-            type: 'user/updateUser',
-            payload: values,
-            callback: (res) => {
-              handleCancel();
-              getTableData();
-            },
-          });
-        } else {
-          // 新增
-          dispatch({
-            type: 'user/addUser',
-            payload: values,
-            callback: (res) => {
-              handleCancel();
-              getTableData();
-            },
-          });
-        }
-      })
-      .catch((info) => {
-        console.log('Validate Failed:', info);
-      });
   };
 
   const handleCancel = () => {
@@ -296,43 +299,6 @@ const User = () => {
           defaultPageSize: 10,
         }}
       />
-
-      <Modal
-        title={modalType ? '编辑用户' : '新增用户'}
-        open={isModalOpen}
-        onOk={handleOK}
-        onCancel={handleCancel}
-        okText="确定"
-        cancelText="取消"
-      >
-        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }} onFinish={handleFinish}>
-          {modalType ? (
-            <Form.Item label="身份ID" name="id">
-              <Input disabled />
-            </Form.Item>
-          ) : null}
-          <Form.Item label="姓名" name="name" rules={[{ required: true, message: '请输入姓名' }]}>
-            <Input placeholder="请输入姓名" />
-          </Form.Item>
-          <Form.Item label="角色" name="role" rules={[{ required: true, message: '请输入角色' }]}>
-            <Input placeholder="请输入角色" />
-          </Form.Item>
-          <Form.Item
-            label="主要技能"
-            name="skills"
-            rules={[{ required: true, message: '请输入主要技能' }]}
-          >
-            <Input placeholder="请输入主要技能" />
-          </Form.Item>
-          <Form.Item
-            label="常住地"
-            name="region"
-            rules={[{ required: true, message: '请输入常住地' }]}
-          >
-            <Input placeholder="请输入常住地" />
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };

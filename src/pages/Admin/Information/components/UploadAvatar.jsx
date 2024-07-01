@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Flex, message, Upload } from 'antd';
+import { Flex, message, Upload, Avatar } from 'antd';
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
   reader.addEventListener('load', () => callback(reader.result));
@@ -17,22 +17,29 @@ const beforeUpload = (file) => {
   }
   return isJpgOrPng && isLt2M;
 };
-const UploadAvatar = ({ changeAvatar }) => {
+const UploadAvatar = (props) => {
+  console.log(props);
+  const { changeAvatar, avatar } = props;
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
+  useEffect(() => {
+    if (avatar) {
+      setImageUrl(avatar);
+    }
+  });
   const handleChange = (info) => {
     if (info.file.status === 'uploading') {
       setLoading(true);
       return;
     }
-    if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (url) => {
-        setLoading(false);
-        setImageUrl(url);
-        changeAvatar(url);
-      });
-    }
+    // if (info.file.status === 'done') {
+    // Get this url from response in real world.
+    getBase64(info.file.originFileObj, (url) => {
+      setLoading(false);
+      setImageUrl(url);
+      changeAvatar(url);
+    });
+    // }
   };
   const uploadButton = (
     <button
@@ -59,21 +66,11 @@ const UploadAvatar = ({ changeAvatar }) => {
         listType="picture-circle"
         className="avatar-uploader"
         showUploadList={false}
-        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+        // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
         beforeUpload={beforeUpload}
         onChange={handleChange}
       >
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="avatar"
-            style={{
-              width: '100%',
-            }}
-          />
-        ) : (
-          uploadButton
-        )}
+        {imageUrl ? <Avatar src={imageUrl} size={100} /> : uploadButton}
       </Upload>
     </Flex>
   );

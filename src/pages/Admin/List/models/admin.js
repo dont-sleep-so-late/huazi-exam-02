@@ -7,7 +7,10 @@ import {
 export default {
   namespace: 'user',
   // 设置state初始数据
-  state: {},
+  state: {
+    //搜索条件及分页码的缓存
+    listData: [],
+  },
   effects: {
     // 调用引入的handleQueryData方法
     *getUser({ payload, callback }, { call, put }) {
@@ -26,6 +29,32 @@ export default {
       const response = yield call(handleDeleteUser, payload);
       callback(response);
     },
+    *setData({ payload, callback }, { call, put }) {
+      yield put({
+        type: 'setSearchData',
+        payload: {
+          listData: payload.listData,
+        },
+      });
+      sessionStorage.setItem('flag', true);
+    },
+    *getData({ payload, callback }, { call, put }) {
+      const response = yield put({
+        type: 'getSearchData',
+      });
+      sessionStorage.setItem('flag', false);
+      callback(response);
+    },
   },
-  reducers: {},
+  reducers: {
+    //搜索条件及分页码的缓存
+    setSearchData(state, { payload }) {
+      localStorage.setItem('listData', JSON.stringify(payload.listData));
+    },
+    getSearchData() {
+      return {
+        payload: localStorage.getItem('listData'),
+      };
+    },
+  },
 };

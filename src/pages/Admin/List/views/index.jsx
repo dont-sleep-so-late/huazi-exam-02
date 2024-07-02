@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, Table, Popconfirm, Avatar, Select, Checkbox, Space } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  Table,
+  Popconfirm,
+  Avatar,
+  Select,
+  Checkbox,
+  Space,
+  message,
+} from 'antd';
 import './index.css';
 import { useEffect } from 'react';
 import { useDispatch } from '@umijs/max';
@@ -12,9 +23,11 @@ const User = () => {
   const [total, setTotal] = useState(0);
   const [listData, setListData] = useState({
     name: '',
+    role: '',
+    page: 1,
+    limit: 10,
   });
   const [loading, setLoading] = useState(false);
-  const [modalType, setModalType] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [searchForm] = Form.useForm();
@@ -85,7 +98,7 @@ const User = () => {
           <Button
             type="primary"
             onClick={() => {
-              handleClick('edit', rowData);
+              handleClick('information', rowData);
             }}
           >
             查看详情
@@ -159,10 +172,10 @@ const User = () => {
   };
 
   const handleClick = (type, data) => {
+    var modalType = true;
     setIsModalOpen(true);
     // 处理点击事件
     if (type == 'add') {
-      setModalType(0);
       navigate('/information', {
         state: {
           modalType,
@@ -170,7 +183,7 @@ const User = () => {
         },
       });
     } else {
-      setModalType(1);
+      modalType = false;
       //表单数据回填
       navigate('/information', {
         state: {
@@ -189,6 +202,7 @@ const User = () => {
       callback: (res) => {
         handleCancel();
         getTableData();
+        message.success(res.data.message);
       },
     });
   };
@@ -196,23 +210,38 @@ const User = () => {
   const handleSearch = (e) => {
     // 处理表单提交事件
     setListData({
-      name: e.username,
+      name: e.username ? e.username.trim() : e.username,
       role: e.role,
       region: e.checkedList,
     });
+    localStorage.setItem('listData', JSON.stringify(listData));
+    console.log(
+      JSON.parse(localStorage.getItem('listData')),
+      "JSON.parse(localStorage.getItem('listData'))",
+    );
   };
 
   const getTableData = () => {
     setLoading(true);
+
     // 获取表格数据
     dispatch({
       type: 'user/getUser',
       payload: listData,
       callback: (res) => {
-        console.log('res', res);
         setTableData(res.data);
         setTotal(res.total);
         setLoading(false);
+        //搜索条件及分页码的缓存
+        // dispatch({
+        //   type: 'user/setData',
+        //   payload: {
+        //     listData,
+        //   },
+        //   callback: (res) => {
+        //     console.log(res, 'setData');
+        //   },
+        // });
       },
     });
   };
@@ -224,9 +253,20 @@ const User = () => {
   };
 
   useEffect(() => {
-    // 页面加载时执行的函数
-    getTableData();
+    // if (sessionStorage.getItem('flag')) {
+    //   dispatch({
+    //     type: 'user/getData',
+    //     callback: (res) => {
+    //       console.log(res, 'resresresresres');
+    //     },
+    //   });
+    //   sessionStorage.setItem('flag', false);
+    // }
   }, []);
+
+  useEffect(() => {
+    getTableData();
+  }, [listData]);
 
   return (
     <div className="user">
@@ -253,13 +293,8 @@ const User = () => {
               placeholder="请选择选择"
             />
           </Form.Item>
-          <Form.Item name="checkedList" label="常住地" valuePropName="region">
-            <CheckboxGroup
-              options={plainOptions}
-              value={checkedList}
-              checked={checked}
-              onChange={onChange}
-            ></CheckboxGroup>
+          <Form.Item name="checkedList" label="常住地">
+            <Checkbox.Group options={plainOptions} onChange={onChange}></Checkbox.Group>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -269,7 +304,6 @@ const User = () => {
           <Button
             onClick={() => {
               searchForm.resetFields();
-              setCheckedList([]);
             }}
           >
             重置

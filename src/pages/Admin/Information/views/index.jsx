@@ -1,22 +1,12 @@
 import React, { useState } from 'react';
-import {
-  Button,
-  Form,
-  Input,
-  Table,
-  Popconfirm,
-  Modal,
-  Select,
-  Checkbox,
-  Space,
-  DatePicker,
-  Radio,
-} from 'antd';
+import { Button, Form, Input, Select, Checkbox, DatePicker, Radio } from 'antd';
 import './index.css';
 import { useEffect } from 'react';
 import { useDispatch, useNavigate, useLocation } from '@umijs/max';
 import UploadAvatar from '../components/UploadAvatar';
 import CascaderProvince from '../components/CascaderProvince';
+import dayjs from 'dayjs';
+import { message } from 'antd';
 
 const Information = () => {
   const dispatch = useDispatch();
@@ -24,14 +14,6 @@ const Information = () => {
   const location = useLocation();
   const state = location.state;
 
-  const [tableData, setTableData] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [listData, setListData] = useState({
-    name: '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [modalType, setModalType] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [searchForm] = Form.useForm();
   const [checked, setChecked] = useState(false);
@@ -81,10 +63,6 @@ const Information = () => {
   ];
   const CheckboxGroup = Checkbox.Group;
   const plainOptions = ['广州', '深圳'];
-  const [regionList, setCheckedList] = useState();
-  const onChange = (list) => {
-    setCheckedList(list);
-  };
   const changeRole = (value) => {
     setRole(value);
   };
@@ -100,17 +78,14 @@ const Information = () => {
           region: values['regionList'],
           remark: values['remark'],
         };
-        console.log(values, 'values');
-        setIsModalOpen(false);
-        if (state.modalType != 0) {
-          console.log('编辑!!', state);
+        if (!state.modalType) {
           //编辑
           dispatch({
             type: 'user/updateUser',
             payload: values,
             callback: (res) => {
-              handleCancel();
               navigate('/Admin');
+              message.success(res.data.message);
             },
           });
         } else {
@@ -119,8 +94,8 @@ const Information = () => {
             type: 'user/addUser',
             payload: values,
             callback: (res) => {
-              handleCancel();
               navigate('/Admin');
+              message.success(res.data.message);
             },
           });
         }
@@ -131,27 +106,21 @@ const Information = () => {
   };
 
   const getTableData = () => {
-    console.log(location, 'location');
     if (location.state) {
       form.setFieldValue('id', state.data['id']);
       form.setFieldValue('name', state.data['name']);
       form.setFieldValue('area', state.data['area']);
-      // form.setFieldValue('birthday', state.data['birthday']);
+      form.setFieldValue(
+        'birthday',
+        dayjs(state.data['birthday'] ? state.data['birthday'] : '2024-01-01'),
+      );
       changeAvatar(state.data['avatar']);
       form.setFieldValue('gender', state.data['gender']);
       form.setFieldValue('role', state.data['role']);
       form.setFieldValue('regionList', state.data['region']);
       form.setFieldValue('skills', state.data['skills']);
       form.setFieldValue('remark', state.data['remark']);
-      console.log(state, 'state');
-      console.log(form.getFieldsValue(), 'form.getFieldsValue()');
     }
-  };
-
-  const handleCancel = () => {
-    // 处理取消按钮点击事件
-    setIsModalOpen(false);
-    form.resetFields();
   };
 
   useEffect(() => {
@@ -236,14 +205,8 @@ const Information = () => {
           >
             <DatePicker placeholder="请选择出生日期" style={{ width: '20%' }} format="YYYY-MM-DD" />
           </Form.Item>
-          <Form.Item name="regionList" label="常住地" valuePropName="region">
-            <CheckboxGroup
-              options={plainOptions}
-              value={regionList}
-              checked={checked}
-              defaultValue={form.getFieldValue('regionList')}
-              onChange={onChange}
-            ></CheckboxGroup>
+          <Form.Item name="regionList" label="常住地">
+            <Checkbox.Group options={plainOptions}></Checkbox.Group>
           </Form.Item>
           <Form.Item label="主要技能" name="skills">
             <Input placeholder="请输入技能" />

@@ -7,7 +7,9 @@ import {
 export default {
   namespace: 'information',
   // 设置state初始数据
-  state: {},
+  state: {
+    
+  },
   effects: {
     // 调用引入的handleQueryData方法
     *setArea({ payload, callback }, { call, put }) {

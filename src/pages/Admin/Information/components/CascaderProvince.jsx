@@ -14,7 +14,7 @@ const CascaderProvince = (props) => {
     <Cascader
       options={options}
       onChange={onChange}
-      defaultValue={value}
+      value={value}
       placeholder="Please select"
       showSearch={{
         filter,

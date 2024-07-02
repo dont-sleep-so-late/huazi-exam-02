@@ -18,7 +18,6 @@ const beforeUpload = (file) => {
   return isJpgOrPng && isLt2M;
 };
 const UploadAvatar = (props) => {
-  console.log(props);
   const { changeAvatar, avatar } = props;
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();

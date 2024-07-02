@@ -193,7 +193,6 @@ let List = [
 ];
 const checkRegion = (region: any, userRegion: any) => {
   if (region.length === 0) return false;
-  console.log(userRegion, region);
   if (userRegion == region) return true;
   return false;
 };
@@ -250,14 +249,13 @@ export default {
   },
 
   'POST /user/updateUser': (req: any, res: Response) => {
-    console.log(req.body);
-
-    const { id, name, role, skills, region, birthday, area, remark } = req.body;
+    const { id, name, role, gender, skills, region, birthday, area, remark } = req.body;
     List.some((u) => {
       if (u.id === id) {
         u.name = name;
         u.role = role;
         u.skills = skills;
+        u.gender = gender;
         u.region = region;
         u.birthday = birthday;
         u.area = area;
@@ -289,7 +287,7 @@ export default {
         code: 200,
         msg: 'success',
         data: {
-          message: '编辑成功',
+          message: '删除成功',
         },
       });
     }

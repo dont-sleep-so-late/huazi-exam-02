@@ -15,8 +15,6 @@ const Information = () => {
   const state = location.state;
 
   const [form] = Form.useForm();
-  const [searchForm] = Form.useForm();
-  const [checked, setChecked] = useState(false);
 
   const [role, setRole] = useState([]);
   const roleList = [
@@ -61,7 +59,6 @@ const Information = () => {
       label: '大数据工程师',
     },
   ];
-  const CheckboxGroup = Checkbox.Group;
   const plainOptions = ['广州', '深圳'];
   const changeRole = (value) => {
     setRole(value);

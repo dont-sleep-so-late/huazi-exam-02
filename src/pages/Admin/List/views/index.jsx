@@ -118,7 +118,7 @@ const User = () => {
     },
   ];
 
-  const [role, setRole] = useState([]);
+  const [role, setRole] = useState();
   const roleList = [
     {
       value: '软件工程师',
@@ -214,11 +214,7 @@ const User = () => {
       role: e.role,
       region: e.checkedList,
     });
-    localStorage.setItem('listData', JSON.stringify(listData));
-    console.log(
-      JSON.parse(localStorage.getItem('listData')),
-      "JSON.parse(localStorage.getItem('listData'))",
-    );
+    // sessionStorage.setItem('listData', JSON.stringify(listData));
   };
 
   const getTableData = () => {
@@ -262,6 +258,8 @@ const User = () => {
     //   });
     //   sessionStorage.setItem('flag', false);
     // }
+    // setListData(JSON.parse(sessionStorage.getItem('listData')));
+    // searchForm.setFieldsValue(listData);
   }, []);
 
   useEffect(() => {
@@ -284,13 +282,13 @@ const User = () => {
           <Form.Item name="username" label="姓名">
             <Input placeholder="姓名" />
           </Form.Item>
-          <Form.Item name="role" label="岗位">
+          <Form.Item style={{ width: 200 }} name="role" label="岗位">
             <Select
+              placeholder="请选择选择"
               options={roleList}
               value={role}
               onChange={changeRole}
               className="form-select"
-              placeholder="请选择选择"
             />
           </Form.Item>
           <Form.Item name="checkedList" label="常住地">

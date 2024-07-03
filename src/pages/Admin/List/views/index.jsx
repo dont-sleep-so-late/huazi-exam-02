@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import './index.css';
 import { useEffect } from 'react';
-import { useDispatch } from '@umijs/max';
+import { useDispatch, useSelector } from '@umijs/max';
 import { useNavigate } from 'umi';
 
 const User = () => {
@@ -27,6 +27,9 @@ const User = () => {
     page: 1,
     limit: 10,
   });
+  const { listData2 } = useSelector((state) => ({
+    listData2: state['user']?.listData,
+  }));
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -210,7 +213,7 @@ const User = () => {
   const handleSearch = (e) => {
     // 处理表单提交事件
     setListData({
-      name: e.username ? e.username.trim() : e.username,
+      name: e.name ? e.name.trim() : e.name,
       role: e.role,
       region: e.checkedList,
     });
@@ -229,15 +232,10 @@ const User = () => {
         setTotal(res.total);
         setLoading(false);
         //搜索条件及分页码的缓存
-        // dispatch({
-        //   type: 'user/setData',
-        //   payload: {
-        //     listData,
-        //   },
-        //   callback: (res) => {
-        //     console.log(res, 'setData');
-        //   },
-        // });
+        dispatch({
+          type: 'user/setData',
+          payload: listData,
+        });
       },
     });
   };
@@ -249,17 +247,8 @@ const User = () => {
   };
 
   useEffect(() => {
-    // if (sessionStorage.getItem('flag')) {
-    //   dispatch({
-    //     type: 'user/getData',
-    //     callback: (res) => {
-    //       console.log(res, 'resresresresres');
-    //     },
-    //   });
-    //   sessionStorage.setItem('flag', false);
-    // }
-    // setListData(JSON.parse(sessionStorage.getItem('listData')));
-    // searchForm.setFieldsValue(listData);
+    searchForm.setFieldsValue(listData2);
+    setListData(listData2);
   }, []);
 
   useEffect(() => {
@@ -279,7 +268,7 @@ const User = () => {
         </Button>
 
         <Form form={searchForm} layout="inline" onFinish={handleSearch}>
-          <Form.Item name="username" label="姓名">
+          <Form.Item name="name" label="姓名">
             <Input placeholder="姓名" />
           </Form.Item>
           <Form.Item style={{ width: 200 }} name="role" label="岗位">

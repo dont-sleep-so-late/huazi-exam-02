@@ -33,28 +33,15 @@ export default {
       yield put({
         type: 'setSearchData',
         payload: {
-          listData: payload.listData,
+          listData: payload,
         },
       });
-      sessionStorage.setItem('flag', true);
-    },
-    *getData({ payload, callback }, { call, put }) {
-      const response = yield put({
-        type: 'getSearchData',
-      });
-      sessionStorage.setItem('flag', false);
-      callback(response);
     },
   },
   reducers: {
     //搜索条件及分页码的缓存
     setSearchData(state, { payload }) {
-      localStorage.setItem('listData', JSON.stringify(payload.listData));
-    },
-    getSearchData() {
-      return {
-        payload: localStorage.getItem('listData'),
-      };
+      return Object.assign({}, state, payload);
     },
   },
 };
